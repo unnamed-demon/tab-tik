@@ -1,36 +1,47 @@
 const data = new Map();
 
-const entry = {
-    domain: null,
-    startingTime: null,
-    setDomain: (domainName) => this.domain = domainName,
-    timeSetter: () => this.startingTime = Date.now(),
-    reset: () => this.domain = null
-}
+let browserActive;
 
-const getTab = (activeTab) => {
-    const urlObj = new URL(activeTab[0].url);
-    if(urlObj.hostname == '')
-        return;
-    entry.setDomain(urlObj.hostname);
-    entry.timeSetter();
-}
+const add = () => {browser.tabs.query({status: "complete", active: true}).then(getTab)};
 
-const add = () => {browser.tabs.query({active: true}).then(getTab)};
 const show = () => {
     for (const [key, value] of data) {
         console.log(`${key} => ${value}`);
     }
 }
 
-const update = () => {
-    if(entry.domain !== null) {
-        data.set(entry.domain, (data.has(entry.domain)?data.get(entry.domain):0) + Date.now() - entry.startingTime);
-        entry.reset();
-    }
-    browser.tabs.query({status: "complete", active: true}).then(getTab);
+const prevDomain = {
+    domain: null,
+    startTime: null
 }
 
+const getTab = (activeTab) => {
+    if(activeTab.length === 0 || !browserActive)
+        return;
+    const urlObj = new URL(activeTab[0].url);
+    if(urlObj.hostname === '')
+        return;
+    prevDomain.domain = urlObj.hostname;
+    prevDomain.startTime = Date.now();
+}
+
+const update = () => {
+    if(prevDomain.domain !== null) {
+        data.set(prevDomain.domain, (data.has(prevDomain.domain)?data.get(prevDomain.domain):0) + Date.now() - prevDomain.startTime);
+        prevDomain.domain = null;
+    }
+    browser.tabs.query({status: "complete", active: true, lastFocusedWindow: true}).then(getTab);
+}
+
+const focusCheck = id => {
+    if(id === browser.windows.WINDOW_ID_NONE)
+        browserActive = false;
+    else
+        browserActive = true;
+    update();
+}
+
+setInterval(update, 60000);
 browser.tabs.onUpdated.addListener(update);
 browser.tabs.onActivated.addListener(update);
-setInterval(update, 60000);
+browser.windows.onFocusChanged.addListener(focusCheck);
