@@ -16,6 +16,11 @@
     "background": {
         "scripts": ["background.js"]
     },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "tabtik@unnamed-demon.dev"
+        }
+    },
     "permissions": [
         "tabs",
         "storage"

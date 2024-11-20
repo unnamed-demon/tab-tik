@@ -1,14 +1,11 @@
-const data = new Map();
+let data;
+browser.storage.local.get("data").then((item) => data = (item.hasOwnProperty("data")?item.data:{}))
 
 let browserActive;
 
 const add = () => {browser.tabs.query({status: "complete", active: true}).then(getTab)};
 
-const show = () => {
-    for (const [key, value] of data) {
-        console.log(`${key} => ${value}`);
-    }
-}
+const show = () => console.log(data)
 
 const prevDomain = {
     domain: null,
@@ -27,7 +24,8 @@ const getTab = (activeTab) => {
 
 const update = () => {
     if(prevDomain.domain !== null) {
-        data.set(prevDomain.domain, (data.has(prevDomain.domain)?data.get(prevDomain.domain):0) + Date.now() - prevDomain.startTime);
+        data[prevDomain.domain] = (data.hasOwnProperty(prevDomain.domain)?data[prevDomain.domain]:0) + Date.now() - prevDomain.startTime;
+        browser.storage.local.set({data});
         prevDomain.domain = null;
     }
     browser.tabs.query({status: "complete", active: true, lastFocusedWindow: true}).then(getTab);
