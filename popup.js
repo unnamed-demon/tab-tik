@@ -1,10 +1,36 @@
-function onGot(tabInfo) {
-    console.log(tabInfo);
-  }
-  
-  function onError(error) {
-    console.log(`Error: ${error}`);
-  }
-  
-  const gettingCurrent = browser.tabs.getCurrent();
-  gettingCurrent.then(onGot, onError);
+const body = document.querySelector("body");
+browser.runtime.getBackgroundPage().then((background) => {
+    background.update();
+    const dataArray = Object.keys(background.data).map((key) => [key, background.data[key]]);
+    dataArray.sort((a, b) => b[1] - a[1]);
+    for(let i = 0; i < dataArray.length && i < 10; i++) {
+        const domain = document.createElement("div");
+        const duration = document.createElement("div");
+        const container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.justifyContent = "space-between";
+        domain.textContent = dataArray[i][0];
+        let tempDuration = dataArray[i][1];
+        const min = Math.trunc(tempDuration / 60000);
+        const hrs = Math.trunc(tempDuration / 3600000);
+        duration.textContent = `${hrs}h ${min}m`;
+        container.appendChild(domain);
+        container.appendChild(duration);
+        body.appendChild(container);
+    }
+    // for(const [key, value] of Object.entries(background.data)) {
+    //     const domain = document.createElement("div");
+    //     const duration = document.createElement("div");
+    //     const container = document.createElement("div");
+    //     container.style.display = "flex";
+    //     container.style.justifyContent = "space-between";
+    //     domain.textContent = key;
+    //     let tempDuration = value;
+    //     const min = Math.trunc(tempDuration / 60000);
+    //     const hrs = Math.trunc(tempDuration / 3600000);
+    //     duration.textContent = `${hrs}h ${min}m`;
+    //     container.appendChild(domain);
+    //     container.appendChild(duration);
+    //     body.appendChild(container);
+    // }
+});

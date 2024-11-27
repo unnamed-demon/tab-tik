@@ -1,4 +1,4 @@
-let data;
+var data;
 browser.storage.local.get("data").then((item) => data = (item.hasOwnProperty("data")?item.data:{}))
 
 let browserActive;
@@ -18,11 +18,13 @@ const getTab = (activeTab) => {
     const urlObj = new URL(activeTab[0].url);
     if(urlObj.hostname === '')
         return;
+    if(urlObj.hostname.slice(0, 4) === "www.")
+        urlObj.hostname = urlObj.hostname.slice(4);
     prevDomain.domain = urlObj.hostname;
     prevDomain.startTime = Date.now();
 }
 
-const update = () => {
+var update = () => {
     if(prevDomain.domain !== null) {
         data[prevDomain.domain] = (data.hasOwnProperty(prevDomain.domain)?data[prevDomain.domain]:0) + Date.now() - prevDomain.startTime;
         browser.storage.local.set({data});
