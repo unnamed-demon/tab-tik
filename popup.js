@@ -1,4 +1,5 @@
 const body = document.querySelector("body");
+
 browser.runtime.getBackgroundPage().then((background) => {
     background.update();
     const dataArray = Object.keys(background.data).map((key) => [key, background.data[key]]);
@@ -18,19 +19,12 @@ browser.runtime.getBackgroundPage().then((background) => {
         container.appendChild(duration);
         body.appendChild(container);
     }
-    // for(const [key, value] of Object.entries(background.data)) {
-    //     const domain = document.createElement("div");
-    //     const duration = document.createElement("div");
-    //     const container = document.createElement("div");
-    //     container.style.display = "flex";
-    //     container.style.justifyContent = "space-between";
-    //     domain.textContent = key;
-    //     let tempDuration = value;
-    //     const min = Math.trunc(tempDuration / 60000);
-    //     const hrs = Math.trunc(tempDuration / 3600000);
-    //     duration.textContent = `${hrs}h ${min}m`;
-    //     container.appendChild(domain);
-    //     container.appendChild(duration);
-    //     body.appendChild(container);
-    // }
 });
+
+const btn = body.querySelector("button");
+btn.addEventListener("click", () => {
+    browser.runtime.getBackgroundPage().then((background) => {
+        background.reset();
+        window.close();
+    })
+})

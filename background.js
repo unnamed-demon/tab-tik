@@ -3,10 +3,6 @@ browser.storage.local.get("data").then((item) => data = (item.hasOwnProperty("da
 
 let browserActive;
 
-const add = () => {browser.tabs.query({status: "complete", active: true}).then(getTab)};
-
-const show = () => console.log(data)
-
 const prevDomain = {
     domain: null,
     startTime: null
@@ -33,12 +29,17 @@ var update = () => {
     browser.tabs.query({status: "complete", active: true, lastFocusedWindow: true}).then(getTab);
 }
 
-const focusCheck = id => {
+const focusCheck = (id) => {
     if(id === browser.windows.WINDOW_ID_NONE)
         browserActive = false;
     else
         browserActive = true;
     update();
+}
+
+var reset = () => {
+    data = {}
+    browser.storage.local.remove("data");
 }
 
 setInterval(update, 60000);
