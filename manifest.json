@@ -10,7 +10,7 @@
           "32": "img/icon_32.png",
           "64": "img/icon_64.png"
         },
-        "default_title": "NewFo",
+        "default_title": "TabTik",
         "default_popup": "popup.html"
     },
     "background": {

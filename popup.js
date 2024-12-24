@@ -1,4 +1,28 @@
 const body = document.querySelector("body");
+const rstBtn = body.querySelector('button[name="reset"]');
+const thmBtn = body.querySelector('button[name="theme"]');
+const thmIcon = thmBtn.querySelector("img");
+
+let theme;
+browser.storage.local.get("theme").then((item) => {
+    if(item.hasOwnProperty("theme"))
+        theme = item.theme;
+    else {
+        theme = "light";
+        browser.storage.local.set({theme});
+    }
+    thmIcon.src = theme === "light"?"./img/light.png":"./img/dark.png";
+    if(theme === "light") {
+        body.classList.remove("dark");
+        rstBtn.classList.remove("dark");
+        thmBtn.classList.remove("dark");
+    }
+    else {
+        body.classList.add("dark");
+        rstBtn.classList.add("dark");
+        thmBtn.classList.add("dark");
+    }
+})
 
 browser.runtime.getBackgroundPage().then((background) => {
     background.update();
@@ -8,8 +32,7 @@ browser.runtime.getBackgroundPage().then((background) => {
         const domain = document.createElement("div");
         const duration = document.createElement("div");
         const container = document.createElement("div");
-        container.style.display = "flex";
-        container.style.justifyContent = "space-between";
+        container.className = "entry";
         domain.textContent = dataArray[i][0];
         let tempDuration = dataArray[i][1];
         const min = Math.trunc(tempDuration / 60000);
@@ -21,10 +44,18 @@ browser.runtime.getBackgroundPage().then((background) => {
     }
 });
 
-const btn = body.querySelector("button");
-btn.addEventListener("click", () => {
+rstBtn.addEventListener("click", () => {
     browser.runtime.getBackgroundPage().then((background) => {
         background.reset();
         window.close();
     })
+})
+
+thmBtn.addEventListener("click", () => {
+    body.classList.toggle("dark");
+    rstBtn.classList.toggle("dark");
+    thmBtn.classList.toggle("dark");
+    theme = theme === "light"?"dark":"light";
+    thmIcon.src = theme === "light"?"./img/light.png":"./img/dark.png";
+    browser.storage.local.set({theme});
 })
